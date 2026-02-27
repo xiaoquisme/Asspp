@@ -242,6 +242,12 @@ jobs:
           security create-keychain -p "${KEYCHAIN_PASS}" "${KEYCHAIN_PATH}"
           security set-keychain-settings -lut 21600 "${KEYCHAIN_PATH}"
           security unlock-keychain -p "${KEYCHAIN_PASS}" "${KEYCHAIN_PATH}"
+
+          # Install Apple WWDR intermediate certificates for trust chain
+          WWDR_G3_PATH="${RUNNER_TEMP}/AppleWWDRCAG3.cer"
+          curl -sL "https://www.apple.com/certificateauthority/AppleWWDRCAG3.cer" -o "${WWDR_G3_PATH}"
+          security import "${WWDR_G3_PATH}" -k "${KEYCHAIN_PATH}" -T /usr/bin/codesign
+
           security import "${CERT_PATH}" -P "${CERT_PASSWORD}" -A -t cert -f pkcs12 -k "${KEYCHAIN_PATH}"
           security set-key-partition-list -S apple-tool:,apple: -k "${KEYCHAIN_PASS}" "${KEYCHAIN_PATH}"
 
